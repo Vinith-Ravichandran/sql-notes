@@ -60,3 +60,40 @@ FROM
 GROUP BY
     product_id;
 Issue: year is selected but not aggregated or included in the GROUP BY clause. This creates ambiguity because there can be multiple year values for each product_id.
+
+
+======================================================================================================================================
+
+difference between group by and partition by:
+
+The PARTITION BY clause and the GROUP BY clause are both used to divide data into groups, but they serve different purposes and are used in different contexts. Here's a detailed explanation of the differences between them, along with examples.
+
+GROUP BY
+The GROUP BY clause is used to aggregate data across multiple rows. It groups rows that have the same values in specified columns into summary rows, such as calculating sums or averages.
+
+Key Points:
+Used in conjunction with aggregate functions (e.g., SUM(), COUNT(), AVG(), MIN(), MAX()).
+Each group returns a single row in the result set.
+All columns in the SELECT statement that are not part of an aggregate function must be included in the GROUP BY clause.
+Example:
+Let's say we have a Sales table with the following data:
+
+product_id	year	quantity	price
+100	2008	10	5000
+100	2009	12	5000
+200	2011	15	9000
+We want to get the total quantity sold for each product:
+
+sql
+Copy code
+SELECT
+    product_id,
+    SUM(quantity) AS total_quantity
+FROM
+    Sales
+GROUP BY
+    product_id;
+Result:
+product_id	total_quantity
+100	22
+200	15
