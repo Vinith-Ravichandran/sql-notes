@@ -97,3 +97,87 @@ Result:
 product_id	total_quantity
 100	22
 200	15
+
+
+
+PARTITION BY
+The PARTITION BY clause is used with window functions to divide the result set into partitions and perform calculations across each partition. Unlike GROUP BY, PARTITION BY does not reduce the number of rows returned. Instead, it performs calculations (like ranking or running totals) within each partition.
+
+Key Points:
+Used with window functions (e.g., ROW_NUMBER(), RANK(), SUM(), AVG() over a window).
+Each partition returns multiple rows, with calculations applied within each partition.
+The result set retains the same number of rows as the original query.
+Example:
+Using the same Sales table, we want to assign a row number to each sale within each product, ordered by year:
+
+sql
+Copy code
+SELECT
+    product_id,
+    year,
+    quantity,
+    price,
+    ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY year) AS row_num
+FROM
+    Sales;
+Result:
+product_id	year	quantity	price	row_num
+100	2008	10	5000	1
+100	2009	12	5000	2
+200	2011	15	9000	1
+Differences Summarized:
+Purpose:
+
+GROUP BY: Aggregates data into summary rows.
+PARTITION BY: Divides the result set into partitions for window functions to perform calculations.
+Context:
+
+GROUP BY: Used with aggregate functions.
+PARTITION BY: Used with window functions.
+Result:
+
+GROUP BY: Reduces the number of rows in the result set.
+PARTITION BY: Does not reduce the number of rows; it performs calculations across partitions.
+Use Cases:
+GROUP BY:
+
+Summarize data: total sales per product, average salary per department, etc.
+
+
+
+PARTITION BY:
+
+Rank data: assign ranks within each category.
+Calculate running totals or averages within partitions.
+Perform lag/lead analysis within partitions.
+Practical Example Combining Both:
+Suppose we want to find the first sale year for each product and calculate the running total quantity sold within each product:
+
+sql
+Copy code
+WITH RankedSales AS (
+    SELECT
+        product_id,
+        year,
+        quantity,
+        price,
+        ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY year) AS rn,
+        SUM(quantity) OVER (PARTITION BY product_id ORDER BY year) AS running_total
+    FROM
+        Sales
+)
+SELECT
+    product_id,
+    year,
+    quantity,
+    price,
+    rn,
+    running_total
+FROM
+    RankedSales
+WHERE
+    rn = 1 OR rn = 2;  -- To see the first and second sales for each product
+This query partitions the sales data by product_id, assigns row numbers, and calculates the running total quantity sold within each product.
+
+Conclusion:
+GROUP BY and PARTITION BY are powerful SQL clauses used for different types of data grouping and calculations. Understanding their differences and appropriate use cases will help you write more efficient and accurate SQL queries.
