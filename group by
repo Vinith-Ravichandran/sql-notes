@@ -1,0 +1,62 @@
+Key Concepts in Grouping and Aggregation
+Group By Clause: When you use the GROUP BY clause, you are grouping rows that have the same values in specified columns into aggregated data. 
+All columns in the SELECT statement that are not part of an aggregate function must be included in the GROUP BY clause.
+
+Aggregate Functions: Functions like MIN(), MAX(), SUM(), AVG(), and COUNT() perform calculations on a set of values and return a single value. 
+These functions can be used in conjunction with GROUP BY to provide aggregated results.
+
+
+Do's:
+Correct Use of GROUP BY with Aggregates:
+
+sql
+Copy code
+SELECT
+    product_id,
+    MIN(year) AS first_year
+FROM
+    Sales
+GROUP BY
+    product_id;
+
+Explanation: Here, we are grouping by product_id and using the aggregate function MIN(year) to get the first year each product was sold. This is correct because product_id is in the GROUP BY clause and year is used within the aggregate function MIN().
+Including Multiple Aggregated Columns:
+
+sql
+Copy code
+SELECT
+    product_id,
+    MIN(year) AS first_year,
+    MAX(price) AS max_price
+FROM
+    Sales
+GROUP BY
+    product_id;
+Explanation: This query correctly groups by product_id and includes two aggregate functions: MIN(year) and MAX(price). Both year and price are used in aggregate functions, so this is correct.
+Don'ts:
+Selecting Non-Aggregated Columns Not in GROUP BY:
+
+sql
+Copy code
+SELECT
+    product_id,
+    MIN(year) AS first_year,
+    price
+FROM
+    Sales
+GROUP BY
+    product_id;
+Issue: price is neither part of an aggregate function nor included in the GROUP BY clause. This is incorrect because SQL does not know which price value to select for each product_id.
+Incorrect Grouping Leading to Ambiguities:
+
+sql
+Copy code
+SELECT
+    product_id,
+    year,
+    COUNT(*)
+FROM
+    Sales
+GROUP BY
+    product_id;
+Issue: year is selected but not aggregated or included in the GROUP BY clause. This creates ambiguity because there can be multiple year values for each product_id.
